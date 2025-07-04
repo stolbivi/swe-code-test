@@ -1,11 +1,12 @@
 const http = require('http');
 const WebSocket = require('ws');
+const { healthCheck } = require('./health');
 
 const PORT = process.env.PORT || 3000;
 
 const server = http.createServer((req, res) => {
   if (req.url === '/health') {
-    return healthCheck();
+    return healthCheck(req, res);
   }
   res.writeHead(404); res.end();
 });
@@ -19,7 +20,7 @@ wss.on('connection', ws => {
   ws.on('close', () => cleanup());
 });
 
-sub.on('message', (channel, message) => {
+wss.on('message', (channel, message) => {
   broadcast();
 });
 
