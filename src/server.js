@@ -236,6 +236,36 @@ function removeClientFromUser(ws, userId) {
   console.log(`Client WebSocket disassociated from user ${userId}`);
 }
 
+// Function to clean up Redis state when a client disconnects
+async function cleanupUserFromRedis(userId) {
+  if (!isRedisConnected || !userId) {
+    console.log(`Redis not connected or no userId provided for cleanup`);
+    return;
+  }
+  
+  try {
+    // Get the user's current room from Redis
+    const room = await redis.hGet(`user:${userId}`, 'room');
+    
+    if (room) {
+      // Remove the user from the room's member set
+      await redis.sRem(`room:${room}`, userId);
+      console.log(`Cleaned up user ${userId} from room ${room}`);
+    } else {
+      console.log(`User ${userId} had no active room`);
+    }
+    
+    // Option 1: Delete the user session completely
+    // await redis.del(`user:${userId}`);
+    
+    // Option 2: Set expiration for potential reconnection (using this approach as suggested)
+    await redis.expire(`user:${userId}`, 3600); // 1 hour expiration
+    
+  } catch (error) {
+    console.error(`Error cleaning up Redis state for user ${userId}:`, error);
+  }
+}
+
 async function handleMessage(ws, message) {
   try {
     const data = JSON.parse(message);
@@ -328,13 +358,25 @@ wss.on('connection', ws => {
     handleMessage(ws, message);
   });
   
-  ws.on('close', () => {
+  ws.on('close', async () => {
     console.log('WebSocket connection closed');
     
-    // Clean up client tracking
+    // Clean up client tracking and Redis state
     const userId = clientUsers.get(ws);
     if (userId) {
       removeClientFromUser(ws, userId);
+      await cleanupUserFromRedis(userId);
+    }
+  });
+  
+  ws.on('error', async (error) => {
+    console.error('WebSocket error:', error);
+    
+    // Clean up client tracking and Redis state
+    const userId = clientUsers.get(ws);
+    if (userId) {
+      removeClientFromUser(ws, userId);
+      await cleanupUserFromRedis(userId);
     }
   });
 });
