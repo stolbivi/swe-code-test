@@ -136,4 +136,10 @@ logs
 
 # Temporary files
 tmp/
-temp/ 
+temp/
+
+# Redis files
+dump.rdb
+appendonly.aof
+redis_backup.rdb
+*.rdb 

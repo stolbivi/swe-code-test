@@ -10,8 +10,8 @@ Testing will be conducted in the following steps:
 # 1. Install dependencies
 npm install
 
-# 2. Start Redis server
-brew services start redis
+# 2. Start Redis server (Docker)
+npm run docker:redis
 
 # 3. Start two Node.js instances (in separate terminals)
 PORT=3000 node server.js
@@ -30,44 +30,62 @@ wscat -c ws://localhost:3001
 curl -i http://localhost:3000/health   # should return HTTP/1.1 200 OK when healthy
 ```
 
-## 3. Redis Server Setup
+## 3. Redis Server Setup (Docker)
 
-This application uses Redis for real-time room management and cross-instance messaging. You need to have Redis running before starting the server.
+This application uses Redis for real-time room management and cross-instance messaging. Redis runs in a Docker container for easy setup and isolation.
 
-### Installation (macOS)
+### Prerequisites
+- Docker and Docker Compose installed on your system
+- No need to install Redis locally anymore!
+
+### Quick Start
 ```bash
-# Install Redis using Homebrew
-brew install redis
+# Start Redis in Docker (daemon mode)
+npm run docker:redis
 
-# Start Redis as a background service
-brew services start redis
+# Or start Redis with management tools
+npm run docker:redis-tools
 
-# Or run Redis manually (foreground)
-redis-server
-```
+# Check Redis status
+npm run redis:check
+# Should return: PONG
 
-### Installation (Linux)
-```bash
-# Ubuntu/Debian
-sudo apt-get install redis-server
+# View Redis logs
+npm run docker:logs
 
-# CentOS/RHEL
-sudo yum install redis
+# Stop Redis
+npm run docker:down
 ```
 
 ### Configuration
-The server connects to Redis using the following environment variables:
+The server connects to Redis using environment variables (see `.env` file):
 - `REDIS_HOST` (default: `127.0.0.1`)
 - `REDIS_PORT` (default: `6379`)
 
-### Testing Redis Connection
-```bash
-# Test if Redis is running
-redis-cli ping
-# Should return: PONG
+### Optional: Redis Management UI
+If you started with `npm run docker:redis-tools`, you can access Redis Commander at:
+- URL: http://localhost:8081
+- This provides a web interface to view and manage Redis data
 
-# Monitor Redis commands (optional)
-redis-cli monitor
+### Docker Commands
+```bash
+# Start only Redis
+docker-compose up redis -d
+
+# Start Redis + management tools
+docker-compose --profile tools up -d
+
+# Stop all services
+docker-compose down
+
+# View logs
+docker-compose logs redis
+
+# Access Redis CLI
+docker-compose exec redis redis-cli
+
+# Monitor Redis commands
+docker-compose exec redis redis-cli monitor
 ```
 
 ## 4. Implementation Requirements

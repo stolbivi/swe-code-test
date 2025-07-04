@@ -98,12 +98,12 @@ This scenario tests that messages sent by one user are broadcast to all other us
 
 4. **Send message from first user** (Terminal 1):
    ```json
-   { "type": "message", "content": "Hello everyone!" }
+   { "type": "message", "room": "lobby", "user": "alice", "text": "Hello everyone!" }
    ```
 
 5. **Send message from second user** (Terminal 2):
    ```json
-   { "type": "message", "content": "Hi Alice!" }
+   { "type": "message", "room": "lobby", "user": "bob", "text": "Hi Alice!" }
    ```
 
 ### Expected Behavior
@@ -151,12 +151,12 @@ This scenario tests that messages are broadcast across different server instance
 
 5. **Send message from first instance** (Terminal 3):
    ```json
-   { "type": "message", "content": "Hello from instance 1!" }
+   { "type": "message", "room": "lobby", "user": "alice", "text": "Hello from instance 1!" }
    ```
 
 6. **Send message from second instance** (Terminal 4):
    ```json
-   { "type": "message", "content": "Hello from instance 2!" }
+   { "type": "message", "room": "lobby", "user": "bob", "text": "Hello from instance 2!" }
    ```
 
 ### Expected Behavior
@@ -209,12 +209,12 @@ This scenario tests that messages are only broadcast to users in the same room, 
 
 5. **Send message from lobby** (Terminal 1):
    ```json
-   { "type": "message", "content": "Lobby message!" }
+   { "type": "message", "room": "lobby", "user": "alice", "text": "Lobby message!" }
    ```
 
 6. **Send message from gameroom** (Terminal 3):
    ```json
-   { "type": "message", "content": "Gameroom message!" }
+   { "type": "message", "room": "gameroom", "user": "charlie", "text": "Gameroom message!" }
    ```
 
 ### Expected Behavior
@@ -249,7 +249,7 @@ This scenario tests that users who join a room after messages have been sent can
 
 3. **Send initial messages** (Terminal 1):
    ```json
-   { "type": "message", "content": "First message" }
+   { "type": "message", "room": "lobby", "user": "alice", "text": "First message" }
    ```
 
 4. **Connect second user later** (Terminal 2):
@@ -264,12 +264,12 @@ This scenario tests that users who join a room after messages have been sent can
 
 5. **Send message from first user** (Terminal 1):
    ```json
-   { "type": "message", "content": "Welcome Bob!" }
+   { "type": "message", "room": "lobby", "user": "alice", "text": "Welcome Bob!" }
    ```
 
 6. **Send message from second user** (Terminal 2):
    ```json
-   { "type": "message", "content": "Thanks Alice!" }
+   { "type": "message", "room": "lobby", "user": "bob", "text": "Thanks Alice!" }
    ```
 
 ### Expected Behavior
@@ -312,7 +312,7 @@ This scenario tests that users can continue receiving and sending broadcasts aft
 
 4. **Send message from first user** (Terminal 1):
    ```json
-   { "type": "message", "content": "Hello Bob!" }
+   { "type": "message", "room": "lobby", "user": "alice", "text": "Hello Bob!" }
    ```
 
 5. **Disconnect second user** (Terminal 2):
@@ -320,7 +320,7 @@ This scenario tests that users can continue receiving and sending broadcasts aft
 
 6. **Send message from first user** (Terminal 1):
    ```json
-   { "type": "message", "content": "Bob are you there?" }
+   { "type": "message", "room": "lobby", "user": "alice", "text": "Bob are you there?" }
    ```
 
 7. **Reconnect second user** (Terminal 2):
@@ -335,12 +335,12 @@ This scenario tests that users can continue receiving and sending broadcasts aft
 
 8. **Send message from first user** (Terminal 1):
    ```json
-   { "type": "message", "content": "Welcome back!" }
+   { "type": "message", "room": "lobby", "user": "alice", "text": "Welcome back!" }
    ```
 
 9. **Send message from second user** (Terminal 2):
    ```json
-   { "type": "message", "content": "I'm back!" }
+   { "type": "message", "room": "lobby", "user": "bob", "text": "I'm back!" }
    ```
 
 ### Expected Behavior
