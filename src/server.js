@@ -50,21 +50,35 @@ async function handleMessage(ws, message) {
   try {
     const data = JSON.parse(message);
     
-    if (data.type === 'init' && data.user && data.room) {
+    if (data.type === 'init' && data.user) {
       const { user, room } = data;
       
       if (!isRedisConnected) {
-        console.log(`Redis not connected. Cannot store room data for ${user} in ${room}`);
+        console.log(`Redis not connected. Cannot handle init for ${user}`);
         return;
       }
       
-      // Save user-room mapping in Redis
-      await redis.hSet(`user:${user}`, 'room', room);
-      
-      // Add user to room set
-      await redis.sAdd(`room:${room}`, user);
-      
-      console.log(`${user} joined ${room}`);
+      if (room) {
+        // Save user-room mapping in Redis
+        await redis.hSet(`user:${user}`, 'room', room);
+        
+        // Add user to room set
+        await redis.sAdd(`room:${room}`, user);
+        
+        console.log(`${user} joined ${room}`);
+      } else {
+        // Lookup and rejoin previous room
+        const previousRoom = await redis.hGet(`user:${user}`, 'room');
+        
+        if (previousRoom) {
+          // Add user to room set
+          await redis.sAdd(`room:${previousRoom}`, user);
+          
+          console.log(`${user} rejoined ${previousRoom}`);
+        } else {
+          console.log(`No previous room found for ${user}`);
+        }
+      }
     }
   } catch (error) {
     console.error('Error handling message:', error);
